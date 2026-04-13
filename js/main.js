@@ -1,3 +1,11 @@
+// ===== EmailJS Configuration =====
+// Replace these with your actual EmailJS credentials after setup
+const EMAILJS_CONFIG = {
+    PUBLIC_KEY: 'IQnv2E9wDJNQHOUMQ',      // Replace with your EmailJS Public Key
+    SERVICE_ID: 'service_fn9i2b9',      // Replace with your EmailJS Service ID
+    TEMPLATE_ID: 'template_p9bo0as'     // Replace with your EmailJS Template ID
+};
+
 // ===== Navigation & Smooth Scrolling =====
 document.addEventListener('DOMContentLoaded', function() {
     const navbar = document.getElementById('navbar');
@@ -7,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const sections = document.querySelectorAll('.section');
     const contactForm = document.getElementById('contactForm');
     const toast = document.getElementById('toast');
+
+    // Initialize EmailJS
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
 
     // Navbar scroll effect
     window.addEventListener('scroll', function() {
@@ -73,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Contact form submission
+    // Contact form submission with EmailJS
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -84,21 +95,54 @@ document.addEventListener('DOMContentLoaded', function() {
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value;
             
-            // Simple validation
-            if (name && email && subject && message) {
-                // Show success toast
-                showToast('Message sent successfully! I\'ll get back to you soon.');
-                
-                // Reset form
-                contactForm.reset();
-            }
+            // Show loading state
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            // Prepare template parameters
+            const templateParams = {
+                from_name: name,
+                from_email: email,
+                subject: subject,
+                message: message,
+                to_email: 'mdthowsif@gmail.com'
+            };
+            
+            // Send email using EmailJS
+            emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, templateParams)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    showToast('Message sent successfully! I\'ll get back to you soon.');
+                    contactForm.reset();
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    showToast('Failed to send message. Please try again or email directly.', 'error');
+                })
+                .finally(function() {
+                    // Reset button state
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                });
         });
     }
 
     // Toast notification function
-    function showToast(message) {
+    function showToast(message, type = 'success') {
         const toastSpan = toast.querySelector('span');
+        const toastIcon = toast.querySelector('i');
+        
         toastSpan.textContent = message;
+        
+        if (type === 'error') {
+            toast.style.background = '#ef4444';
+            toastIcon.className = 'fas fa-exclamation-circle';
+        } else {
+            toast.style.background = '#10b981';
+            toastIcon.className = 'fas fa-check-circle';
+        }
+        
         toast.classList.add('show');
         
         setTimeout(() => {
