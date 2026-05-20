@@ -3,7 +3,7 @@
 const EMAILJS_CONFIG = {
     PUBLIC_KEY: 'IQnv2E9wDJNQHOUMQ',      // Replace with your EmailJS Public Key
     SERVICE_ID: 'service_fn9i2b9',      // Replace with your EmailJS Service ID
-    TEMPLATE_ID: 'template_p9bo0as'     // Replace with your EmailJS Template ID
+    TEMPLATE_ID: 'template_m3pzl5k'     // Replace with your EmailJS Template ID
 };
 
 // ===== Navigation & Smooth Scrolling =====
